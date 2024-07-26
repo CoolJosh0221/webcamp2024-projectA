@@ -23,11 +23,20 @@ const createWorkItem = (workName) => {
 		if (newName === null) return;
 		let workList = localStorage.getItem('work-list');
 		workList = workList ? JSON.parse(workList) : [];
+
+		let uuidDict = localStorage.getItem('uuid-dict');
+		uuidDict = uuidDict ? JSON.parse(uuidDict) : {};
+
 		if (newName && !isNameDuplicated(newName)) {
 			workDisplay.textContent = `作品名稱: ${newName}`;
 			let index = workList.indexOf(oldName);
 			workList[index] = newName;
+
+			uuidDict[newName] = uuidDict[oldName];
+			delete uuidDict[oldName];
+
 			localStorage.setItem('work-list', JSON.stringify(workList));
+			localStorage.setItem('uuid-dict', JSON.stringify(uuidDict));
 		} else {
 			alert('作品名稱重複或為空白，請重新輸入');
 		}
@@ -41,10 +50,12 @@ const createWorkItem = (workName) => {
 		let currentUrl = window.location.href;
 		let newUrl = new URL(currentUrl.replace('index.html', 'notes.html'));
 
-		let uuidDict = localStorage.getItem('uuid-list');
+		let uuidDict = localStorage.getItem('uuid-dict');
 		uuidDict = uuidDict ? JSON.parse(uuidDict) : {};
 
 		newUrl.searchParams.append('s', uuidDict[workDisplay.textContent.split(': ')[1]]);
+
+		localStorage.setItem('uuid-dict', JSON.stringify(uuidDict));
 
 		window.open(newUrl, '');
 	};
@@ -61,12 +72,13 @@ const createWorkItem = (workName) => {
 			let index = workList.indexOf(workName);
 			workList.splice(index, 1);
 
-			let uuidDict = localStorage.getItem('uuid-list');
+			let uuidDict = localStorage.getItem('uuid-dict');
 			uuidDict = uuidDict ? JSON.parse(uuidDict) : {};
 
 			delete uuidDict[workDisplay.textContent.split(': ')[1]];
 
 			localStorage.setItem('work-list', JSON.stringify(workList));
+			localStorage.setItem('uuid-dict', JSON.stringify(uuidDict));
 		}
 	};
 
@@ -94,12 +106,12 @@ addButton.addEventListener('click', () => {
 		workList = workList ? JSON.parse(workList) : [];
 		workList.push(workName);
 
-		let uuidDict = localStorage.getItem('uuid-list');
+		let uuidDict = localStorage.getItem('uuid-dict');
 		uuidDict = uuidDict ? JSON.parse(uuidDict) : {};
 		uuidDict[workName] = crypto.randomUUID();
 
 		localStorage.setItem('work-list', JSON.stringify(workList));
-		localStorage.setItem('uuid-list', JSON.stringify(uuidDict));
+		localStorage.setItem('uuid-dict', JSON.stringify(uuidDict));
 
 		createWorkItem(workName);
 		input.value = '';
