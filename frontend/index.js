@@ -40,9 +40,23 @@ const createWorkItem = (workName) => {
 		window.open('about:blank', '_blank');
 	};
 
+	const removeButton = document.createElement('button');
+	removeButton.textContent = '刪除';
+	removeButton.type = 'button';
+	removeButton.className = 'btn btn-primary';
+	removeButton.onclick = function () {
+		workContainer.remove();
+		let workList = localStorage.getItem('work-list');
+		workList = workList ? JSON.parse(workList) : [];
+		let index = workList.indexOf(workName);
+		workList.splice(index, 1);
+		localStorage.setItem('work-list', JSON.stringify(workList));
+	};
+
 	workContainer.appendChild(workDisplay);
 	workContainer.appendChild(renameButton);
 	workContainer.appendChild(enterButton);
+	workContainer.appendChild(removeButton);
 	document.getElementById('work-list').appendChild(workContainer);
 };
 
