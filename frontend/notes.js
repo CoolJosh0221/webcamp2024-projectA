@@ -3,6 +3,10 @@ function getQueryParam(param) {
 	return urlParams.get(param);
 }
 
+function getKeyByValue(object, value) {
+	return Object.keys(object).find((key) => object[key] === value);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 	const noteContentElement = document.getElementById('note-content');
 	const noteUUID = getQueryParam('s');
