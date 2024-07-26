@@ -20,6 +20,7 @@ const createWorkItem = (workName) => {
 	renameButton.onclick = function () {
 		const oldName = workDisplay.textContent.split(': ')[1];
 		const newName = prompt('請輸入新的作品名稱:', workDisplay.textContent.split(': ')[1]);
+		if (newName === null) return;
 		let workList = localStorage.getItem('work-list');
 		workList = workList ? JSON.parse(workList) : [];
 		if (newName && !isNameDuplicated(newName)) {
@@ -37,7 +38,15 @@ const createWorkItem = (workName) => {
 	enterButton.type = 'button';
 	enterButton.className = 'btn btn-primary';
 	enterButton.onclick = function () {
-		window.open('about:blank', '_blank');
+		let currentUrl = window.location.href;
+		let newUrl = new URL(currentUrl.replace('index.html', 'notes.html'));
+
+		let uuidDict = localStorage.getItem('uuid-list');
+		uuidDict = uuidDict ? JSON.parse(uuidDict) : {};
+
+		newUrl.searchParams.append('s', uuidDict[workDisplay.textContent.split(': ')[1]]);
+
+		window.open(newUrl, '');
 	};
 
 	const removeButton = document.createElement('button');
@@ -45,12 +54,20 @@ const createWorkItem = (workName) => {
 	removeButton.type = 'button';
 	removeButton.className = 'btn btn-primary';
 	removeButton.onclick = function () {
-		workContainer.remove();
-		let workList = localStorage.getItem('work-list');
-		workList = workList ? JSON.parse(workList) : [];
-		let index = workList.indexOf(workName);
-		workList.splice(index, 1);
-		localStorage.setItem('work-list', JSON.stringify(workList));
+		if (confirm('確定刪除？此步驟無法復原。')) {
+			workContainer.remove();
+			let workList = localStorage.getItem('work-list');
+			workList = workList ? JSON.parse(workList) : [];
+			let index = workList.indexOf(workName);
+			workList.splice(index, 1);
+
+			let uuidDict = localStorage.getItem('uuid-list');
+			uuidDict = uuidDict ? JSON.parse(uuidDict) : {};
+
+			delete uuidDict[workDisplay.textContent.split(': ')[1]];
+
+			localStorage.setItem('work-list', JSON.stringify(workList));
+		}
 	};
 
 	workContainer.appendChild(workDisplay);
@@ -76,7 +93,13 @@ addButton.addEventListener('click', () => {
 		let workList = localStorage.getItem('work-list');
 		workList = workList ? JSON.parse(workList) : [];
 		workList.push(workName);
+
+		let uuidDict = localStorage.getItem('uuid-list');
+		uuidDict = uuidDict ? JSON.parse(uuidDict) : {};
+		uuidDict[workName] = crypto.randomUUID();
+
 		localStorage.setItem('work-list', JSON.stringify(workList));
+		localStorage.setItem('uuid-list', JSON.stringify(uuidDict));
 
 		createWorkItem(workName);
 		input.value = '';
