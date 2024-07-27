@@ -1,26 +1,9 @@
-// index.js
+import { getWorkList, setWorkList, getUuidDict, setUuidDict } from './storageHelpers.js';
 
 // DOM Elements
 const addButton = document.getElementById('add-button');
 const workInput = document.getElementById('work-input');
 const workList = document.getElementById('work-list');
-
-// Local Storage Helpers
-const getLocalStorageItem = (key, defaultValue) => {
-	const item = localStorage.getItem(key);
-	return item ? JSON.parse(item) : defaultValue;
-};
-
-const setLocalStorageItem = (key, value) => {
-	localStorage.setItem(key, JSON.stringify(value));
-};
-
-// Work List Operations
-const getWorkList = () => getLocalStorageItem('work-list', []);
-const setWorkList = (list) => setLocalStorageItem('work-list', list);
-
-const getUuidDict = () => getLocalStorageItem('uuid-dict', {});
-const setUuidDict = (dict) => setLocalStorageItem('uuid-dict', dict);
 
 const isNameDuplicated = (workName) => getWorkList().includes(workName);
 
